@@ -568,20 +568,27 @@
     </form>
     <?php } ?>
 
-
-    Veiem que es connecta a una BBDD.
+    
+    Veiem que la pàgina web esta formada per un login (d'username i password) i si aconseguim entrar amb algún usuari, ens mostrara la contrasenya.
     Tenim la següent sentència on veiem que pot ser injectable.
         $query = "SELECT * from users where username=\"".$_REQUEST["username"]."\" and password=\"".$_REQUEST["password"]."\"";
     
-    Si en el loggin inserim "a" i "b", ens queda aixi:
+    Dedueixo que puc fer una injecció SQL, per tant, ara és el moment d'utilitzar caràcters estranys i aplicar seqüències SQL interessants.
+    Per fer-ho fàcil i poder veure més clarament la sentència; en el login inserim "a" i "b", ens queda aixi:
         $query = "SELECT * from users where username="a" and password="b";
     El nostre payload:
         $query = "SELECT * from users where username="a" and password=""or 1=1-- -";
         $query = "SELECT * from users where username="a" and password=""or 1=1#";
 
+    Estem inserint: "or 1=1-- -
     Bàsicament, la query està fent: (FALSE I FALSE) or TRUE.
     Sempre serà TRUE, per tant esta fent un SELECT * form users.
     Per això quan ens diu que ha de tenir més de 0 rows, ens ho pilla.
+
+    Aquí és important utilitzar el comentari, perquè sinó no hi hauria cap row i no ens mostraria la password.
+    
+    La vulnerabilitat està en que no es saneja el codi d'entrada de la sentència SQL.
+    És a dir, li podem passar qualsevol sentència SQL que sempre ho executarà.
 
 
 #  NATAS 15
@@ -592,23 +599,19 @@
 
     <div id="content">
     <?php
-
     /*
     CREATE TABLE `users` (
     `username` varchar(64) DEFAULT NULL,
     `password` varchar(64) DEFAULT NULL
     );
     */
-
     if(array_key_exists("username", $_REQUEST)) {
         $link = mysqli_connect('localhost', 'natas15', '<censored>');
         mysqli_select_db($link, 'natas15');
-
         $query = "SELECT * from users where username=\"".$_REQUEST["username"]."\"";
         if(array_key_exists("debug", $_GET)) {
             echo "Executing query: $query<br>";
         }
-
         $res = mysqli_query($link, $query);
         if($res) {
         if(mysqli_num_rows($res) > 0) {
@@ -619,18 +622,27 @@
         } else {
             echo "Error in query.<br>";
         }
-
         mysqli_close($link);
     } else {
     ?>
 
-    Si en l'usuari posem: a, ens torna: This user doesn't exist.
-    Si en l'usuari posem: " or 1=1#, ens torna: This user exists.
-    Igual que si posem natas16.
+    Tenim un exercici semblant a l'anterior; una base de dades i una sentència SQL.
+    En aquest cas però, no tenim un login. Simplement mira si un usuari existeix o no.
+    El problema està en que si aconseguim fer una injecció SQL, mai aconseguirem el password.
+    Haurem de fer un atac de força bruta i anar treient el password lletra a lletra.
 
-    Encara que fem sql injection, en cap moment ens tornara el password, simplement ens tornara un 200 (this user exists).
-    Per tant, podem fer brute force del password.
-    És a dir, password like %s.
+    Si en l'usuari posem: a, ens torna: This user doesn't exist.
+    Si en l'usuari posem: " or 1=1#, ens torna: This user exists. --> He aprofitat el codi de l'anterior natas.
+    Igual que si posem natas16, també ens mostra que l'usuari existeix.
+
+    Procedim a crear un script (natas16_1.py) on farem moltes peticions a la pàgina del natas.
+    Aquestes peticions estaran compostes d'una sentència SQL a l'apartat de l'username:
+        'natas16" and password like binary "{}%"#'.format(partialpass)
+    D'aquesta manera, l'user natas16 sempre existirà, i a més a més, li demanem la password d'aquest.
+
+    La història està en que si l'usuari és natas16 i la password comença per 'a', ens tornarà el text "This user exists".
+    Però si l'usuari és natas16 i la password comença per 'b', ens tornarà el text "This user doesn't exists".
+    Per tant, haurem de fer un bucle, anar caràcter a caràcter (a-z, A-Z i 0-9) i sempre que ens torni el text de "This user exists", serà un caràcter de la password.
 
 
 #  NATAS 16
