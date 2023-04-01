@@ -1,4 +1,5 @@
-# Bandit
+# OVERTHEWIRE GAMES - BANDIT
+
 ### ssh bandit0@bandit.labs.overthewire.org -p 2220 (bandit0)
 ```
 HINT: The password for the next level is stored in a file called readme located in the home directory. 

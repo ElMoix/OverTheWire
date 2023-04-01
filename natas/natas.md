@@ -1,6 +1,6 @@
 # OVERTHEWIRE GAMES - NATAS
 
-# NATAS 0
+## NATAS 0
 
     Username: natas0
     Password: natas0
@@ -13,7 +13,7 @@
     
     <!--The password for natas1 is g9D9cREhslqBKtcA2uocGHPfMZVzeFK6 -->
 
-# NATAS 1
+## NATAS 1
 
     Username: natas1
     Password: g9D9cREhslqBKtcA2uocGHPfMZVzeFK6
@@ -25,7 +25,7 @@
     Dintre del body trobem:
     <!--The password for natas2 is h4ubbcXrWqsTo7GGnnUMLppXbOogfBZ7 -->
 
-# NATAS 2
+## NATAS 2
 
     Username: natas2
     Password: h4ubbcXrWqsTo7GGnnUMLppXbOogfBZ7
@@ -44,7 +44,7 @@
 
     Podem veure l'users.txt dintre el directori ja que ens deixa indexar tot el que estigui dintre d'aquest directori. Per tant, tot el que estigui dintre /files, és públic. Podem fer 'fuzzing'.
 
-# NATAS 3
+## NATAS 3
     
     Username: natas3
     Password: G6ctbMJ5Nb4cbFwhpMPSvxGHhQ7I6W8Q
@@ -67,7 +67,7 @@
 
     Han tornat a liarla com el NATAS2, ja que no hauriem de ser capaços de veure el fitxer 'users.txt'.
 
-# NATAS 4
+## NATAS 4
 
     Username: natas4
     Password: tKOcJIbzM4lTs8hbCmzn5Zr4434fGZQm
@@ -85,7 +85,7 @@
     Canviem aquesta URL per natas5 i trobem la password.
     Access granted. The password for natas5 is Z0NsrtIkJoKALBCLi5eqFfcRN82Au2oD
 
-# NATAS 5
+## NATAS 5
 
     Username: natas5
     Password: Z0NsrtIkJoKALBCLi5eqFfcRN82Au2oD
@@ -99,7 +99,7 @@
     Suposem que 0=false, si posem un 1(=true), podem veure la password.
     Access granted. The password for natas6 is fOIvE0MDtPTgRhqmmvvAOt2EfXR6uQgR
 
-# NATAS 6
+## NATAS 6
 
     Username: natas6
     Password: fOIvE0MDtPTgRhqmmvvAOt2EfXR6uQgR
@@ -135,7 +135,7 @@
     Han passat el check de quan anem a /includes, no ens mostra cap fitxer, és més, ens surt FORBIDDEN. Per tant, han tret l'indexador.
     Però l'han liat en què la password és en text clar i a més, que qualsevol usuari pot accedir-hi. Hauria d'accedir-s'hi nomès des del server (secret definit de forma Global).
 
-# NATAS 7
+## NATAS 7
 
     Username: natas7
     Password: jmxSiH3SP6Sonf8dv66ng8v1cIEdjXWr
@@ -156,7 +156,7 @@
     http://natas7.natas.labs.overthewire.org/index.php?page=/etc/natas_webpass/natas8 i ens mostra la password.
 
 
-# NATAS 8
+## NATAS 8
 
     Username: natas8
     Password: a6bZCNYwdKqN5cGP11ZdtPg0iImQQhAB
@@ -194,7 +194,7 @@
 
     Si ho posem al formulari de la nostra pàgina web, ens dona la password:
     Access granted. The password for natas9 is Sda6t0vkOPkM8YeOZkAGVhFoaplvlJFd
-# NATAS 9
+## NATAS 9
 
     Username: natas9
     Password: Sda6t0vkOPkM8YeOZkAGVhFoaplvlJFd
@@ -229,7 +229,7 @@
     D44EcsFkLxPIkAAKLosx8z3hxX1Z4MCE
 
 
-# NATAS 10
+## NATAS 10
 
     Username: natas10
     Password: D44EcsFkLxPIkAAKLosx8z3hxX1Z4MCE
@@ -269,7 +269,7 @@
     /etc/natas_webpass/natas11:1KFqoJXi6hRaPluAmk8ESDW4fSysRoIg
 
 
-#  NATAS 11
+##  NATAS 11
 
     Username: natas11
     Password: 1KFqoJXi6hRaPluAmk8ESDW4fSysRoIg
@@ -372,7 +372,7 @@
     The password for natas12 is YWqo0pjpcXzSIl5NMAVxg12QxeC1w9QG
 
 
-#  NATAS 12
+## NATAS 12
 
     Username: natas12
     Password: YWqo0pjpcXzSIl5NMAVxg12QxeC1w9QG
@@ -446,7 +446,7 @@
     Apart de que no ens hauria de poder deixar pujar fitxers que no siguin JPEG.
 
 
-#  NATAS 13
+##  NATAS 13
 
     Username: natas13
     Password: lW3jYRI02ZKDBb8VtQBU1f6eDRo6WEj9
@@ -537,7 +537,7 @@
         ?>
 
 
-#  NATAS 14
+##  NATAS 14
 
     Username: natas14
     Password: qPazSJBmrmU7UQJv17MHk1PGC4DxZMEP
@@ -591,7 +591,7 @@
     És a dir, li podem passar qualsevol sentència SQL que sempre ho executarà.
 
 
-#  NATAS 15
+##  NATAS 15
 
     Username: natas15
     Password: TTkaI7AWG4iDERztBcEyKV7kRXH1EZRB
@@ -645,7 +645,7 @@
     Per tant, haurem de fer un bucle, anar caràcter a caràcter (a-z, A-Z i 0-9) i sempre que ens torni el text de "This user exists", serà un caràcter de la password.
 
 
-#  NATAS 16
+##  NATAS 16
 
     Username: natas16
     Password: TRD7iZrd5gATjj9PkPEuaOlfEjHqj32V
